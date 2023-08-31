@@ -88,16 +88,6 @@ public class CardsServiceImpl implements CardsService {
                 ResponseStatus.SUCCESS.getDescription(), cardMapper.cardDTO(card));
     }
 
-    private Card getCardByUser(long id) throws Exception {
-        var loggedInUser = new HelperUtils(userRepository).currentlyLoggedInUser();
-
-        if (loggedInUser.getUserType().getName().equalsIgnoreCase("Member")) {
-            return cardsRepository.findByIdAndCreatedBy(id, loggedInUser.getId()).orElseThrow(() -> new ResourceNotFoundException("Card not found!"));
-        } else {
-            return cardsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Card not found!"));
-        }
-    }
-
     @Override
     public APIResponse pagedFetching(Integer pageNo, Integer pageSize, String sortBy, String filterBy, String filterValue, boolean asc) throws Exception {
         if (!validSortBy(sortBy)) {
@@ -129,7 +119,7 @@ public class CardsServiceImpl implements CardsService {
                         cards);
     }
 
-    public Card validateCard(CardDTO cardDTO, User loggedInUser) throws Exception {
+    private Card validateCard(CardDTO cardDTO, User loggedInUser) throws Exception {
         var card = cardMapper.card(cardDTO);
         if (Strings.isEmpty(card.getName())) {
             throw new BadRequestException("Name is required");
@@ -152,6 +142,16 @@ public class CardsServiceImpl implements CardsService {
         return card;
     }
 
+    private Card getCardByUser(long id) throws Exception {
+        var loggedInUser = new HelperUtils(userRepository).currentlyLoggedInUser();
+
+        if (loggedInUser.getUserType().getName().equalsIgnoreCase("Member")) {
+            return cardsRepository.findByIdAndCreatedBy(id, loggedInUser.getId()).orElseThrow(() -> new ResourceNotFoundException("Card not found!"));
+        } else {
+            return cardsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Card not found!"));
+        }
+    }
+
     private boolean isColorValid(String color) {
         if (!color.startsWith("#")) {
             return false;
@@ -166,7 +166,7 @@ public class CardsServiceImpl implements CardsService {
                 sortBy.equalsIgnoreCase("createdOn") || sortBy.equalsIgnoreCase("status");
     }
 
-    public boolean isDateValid(String dateString) {
+    private boolean isDateValid(String dateString) {
         try {
             formatter.parse(dateString);
             return true;
