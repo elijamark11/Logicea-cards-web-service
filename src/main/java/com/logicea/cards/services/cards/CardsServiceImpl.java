@@ -107,8 +107,7 @@ public class CardsServiceImpl implements CardsService {
         Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        Page<CardDTO> cards;
-        cards = cardsRepository
+        Page<CardDTO> cards = cardsRepository
                 .findAll(
                         CardsSpecification.filterCards(filterBy, filterValue, loggedInUser),
                         pageable
