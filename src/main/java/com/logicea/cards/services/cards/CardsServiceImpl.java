@@ -108,10 +108,7 @@ public class CardsServiceImpl implements CardsService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
         Page<CardDTO> cards = cardsRepository
-                .findAll(
-                        CardsSpecification.filterCards(filterBy, filterValue, loggedInUser),
-                        pageable
-                ).map(cardMapper::cardDTO);
+                .findAll(CardsSpecification.filterCards(filterBy, filterValue, loggedInUser), pageable).map(cardMapper::cardDTO);
 
         return new APIResponse<>
                 (ResponseStatus.SUCCESS.getResponseCode(), ResponseStatus.SUCCESS.getDescription(),
